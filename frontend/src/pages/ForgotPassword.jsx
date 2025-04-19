@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../stores/authStore";
+import { Loader } from "lucide-react";
 
 export default function ForgotPassword() {
-  const {forgotPassword} = useAuthStore();
+  const {forgotPassword ,loading} = useAuthStore();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
 
@@ -31,7 +32,17 @@ export default function ForgotPassword() {
             required
             className="input input-bordered w-full mb-3"
           />
-          <button type="submit" className="btn btn-primary w-full">Send OTP</button>
+          <button 
+            type="submit" 
+            className="btn btn-primary w-full"
+            disabled={loading}
+          >
+            {loading?(
+              <Loader className="animate-spin" />
+            ):(
+              "Send OTP"
+            )}
+          </button>
         </form>
       </div>
     </div>

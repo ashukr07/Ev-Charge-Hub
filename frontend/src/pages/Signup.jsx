@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/Spinner.jsx";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const { signup } = useAuthStore();
+  const { signup,loading } = useAuthStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -83,7 +84,17 @@ export default function Signup() {
             <option value="user">User</option>
             <option value="manager">Manager</option>
           </select>
-          <button type="submit" className="btn btn-primary w-full">Signup</button>
+          <button 
+            type="submit" 
+            className="btn btn-primary w-full"
+            disabled={loading} // Disable button while loading
+          >
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              "Signup"
+            )}
+          </button>
         </form>
         <div className="text-center mt-3">
           <a href="/login" className="text-secondary">Already have an account! Login</a>

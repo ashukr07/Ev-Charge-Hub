@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import LoadingSpinner from "./Spinner.jsx";
 
 const StationForm = ({ station, onSave, onClose }) => {
+
   const [formData, setFormData] = useState({
     name: station?.name || "",
     status: station?.status || "active",
@@ -102,7 +104,10 @@ const StationForm = ({ station, onSave, onClose }) => {
 
         {/* Save & Close Buttons */}
         <div className="modal-action">
-          <button className="btn btn-primary" onClick={() => onSave(formData)}>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => onSave(formData)}
+          >
             Save
           </button>
           <button className="btn" onClick={onClose}>
@@ -113,4 +118,4 @@ const StationForm = ({ station, onSave, onClose }) => {
     </div>
   );
 };
- export default StationForm
+export default StationForm

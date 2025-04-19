@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import useStationStore from "../stores/stationStore";
 import MapSelector from "../components/MapSelector";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/Spinner";
 
 export default function AddStation() {
-  const { addStation } = useStationStore();
+  const { addStation, loading } = useStationStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -34,8 +35,7 @@ export default function AddStation() {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-base-100 shadow-lg rounded-lg mt-10">
       <h2 className="text-2xl font-bold text-primary mb-4">Add New Charging Station</h2>
-
-      <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row gap-6">
         {/* Left Side - Form */}
         <div className="w-full md:w-1/2">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -70,8 +70,16 @@ export default function AddStation() {
               className="input input-bordered w-full"
             />
 
-            <button type="submit" className="btn btn-primary w-full">
-              Add Station
+            <button 
+              type="submit" 
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <LoadingSpinner />
+              ) : (
+                "Add Station"
+              )}
             </button>
           </form>
         </div>
@@ -82,6 +90,7 @@ export default function AddStation() {
           <MapSelector onLocationSelect={handleLocationSelect} />
         </div>
       </div>
+      
     </div>
   );
 }

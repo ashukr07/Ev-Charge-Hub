@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // ✅ Import useLocation
 import toast from "react-hot-toast";
 import { useAuthStore } from "../stores/authStore.js";
+import LoadingSpinner from "../components/Spinner.jsx";
 
 export default function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, verifyOTP, resendOTP } = useAuthStore();
+  const { user, verifyOTP, resendOTP,loading } = useAuthStore();
   const [otp, setOtp] = useState("");
 
   // ✅ Get email from user or from location state
@@ -22,21 +23,18 @@ export default function VerifyOTP() {
     e.preventDefault();
     try {
       await verifyOTP(email, otp);
-      toast.success("OTP verified successfully! Redirecting...");
-
       // ✅ Navigate to login after OTP verification
       navigate("/login");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Invalid OTP");
+      console.error("Verification failed:", error);
     }
   };
 
   const handleResendOTP = async () => {
     try {
       await resendOTP(email);
-      toast.success("OTP sent again! Please check your email.");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to resend OTP");
+      console.error("Resend OTP failed:", error);
     }
   };
 
@@ -57,7 +55,17 @@ export default function VerifyOTP() {
           />
           <button type="submit" className="btn btn-primary w-full">Verify OTP</button>
         </form>
-        <button onClick={handleResendOTP} className="btn btn-secondary w-full mt-3">Resend OTP</button>
+        <button 
+          onClick={handleResendOTP} 
+          className="btn btn-secondary w-full mt-3"
+          disabled={loading}
+        >
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            "Resend OTP"
+          )}
+        </button>
       </div>
     </div>
   );

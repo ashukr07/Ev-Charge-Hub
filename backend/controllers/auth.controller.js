@@ -313,3 +313,12 @@ export const userDashboard = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+export const getUserDetails = async (req, res) => {
+    try {
+        return res.json(req.user);
+    } catch (error) {
+        console.error("Error in getUserDetails controller ", error.message);
+        return res.status(500).json({error: error.message});
+    }
+}

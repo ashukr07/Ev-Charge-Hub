@@ -52,7 +52,15 @@ const userSchema = new mongoose.Schema({
     pendingPenalty: { 
         type: Number, 
         default: 0 
-    } // Stores penalty for the next booking
+    }, // Stores penalty for the next booking
+    totalRewards: {
+        type: Number, 
+        default: 0 
+    }, // Total rewards earned by user
+    totalPenalties: {
+        type: Number, 
+        default: 0 
+    }, // Total penalties incurred by user
 
 },{timestamps: true});
 

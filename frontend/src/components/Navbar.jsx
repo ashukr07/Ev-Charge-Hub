@@ -16,6 +16,7 @@ function Navbar() {
     { id: "booking", name: "Book Slot", path: "/booking-slot" },
     //{ id: "dashboard", name: "Dashboard", path: user ? `/${user.role}-dashboard` : "/login" },
   ];
+  console.log("in navbar",user);
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-lg bg-neutral bg-opacity-50 shadow-md">
@@ -28,8 +29,8 @@ function Navbar() {
           >
             <img src="/evchargehub-logo.png" className="w-10 h-10 object-contain" />
             <p className="text-[18px] text-white font-bold cursor-pointer flex">
-              EV Charge&nbsp;
-              <span className="sm:block hidden">Hub</span>
+              
+              <span className="sm:block hidden">EV Charge Hub</span>
             </p>
           </Link>
         </div>

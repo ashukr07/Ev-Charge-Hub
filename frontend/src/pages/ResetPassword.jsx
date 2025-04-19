@@ -3,11 +3,12 @@ import {  useNavigate } from "react-router-dom";
 
 import toast from "react-hot-toast";
 import { useAuthStore } from "../stores/authStore";
+import LoadingSpinner from "../components/Spinner";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   //const location = useLocation();
-  const {resetPassword} =useAuthStore()
+  const {resetPassword,loading} =useAuthStore()
   //const email = location.state?.email || ""; 
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -43,7 +44,17 @@ export default function ResetPassword() {
             required
             className="input input-bordered w-full mb-3 text-center"
           />
-          <button type="submit" className="btn btn-primary w-full">Reset Password</button>
+          <button 
+            type="submit" 
+            className="btn btn-primary w-full"
+            disabled={loading}
+          >
+            {loading?(
+              <LoadingSpinner />
+            ):(
+              "Reset Password"
+            )}
+          </button>
         </form>
       </div>
     </div>

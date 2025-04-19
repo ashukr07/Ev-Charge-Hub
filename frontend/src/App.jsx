@@ -15,8 +15,28 @@ import BookingSlot from './pages/BookingSlot';
 import { Toaster } from 'react-hot-toast';
 import ChangePassword from './pages/ChangePassword';
 import AddStation from './pages/AddStation';
+import { useAuthStore } from './stores/authStore';
+import { useEffect } from 'react';
+import BookingHistory from './components/BookingHistory';
+import EditStation from './pages/EditStation';
+import StationBookings from './pages/StationBookings';
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
+import LoadingSpinner from './components/Spinner';
 
 export default function App() {
+  const {checkAuth,checkingAuth} = useAuthStore()
+  
+
+  useEffect(() =>{
+    checkAuth()
+  },[checkAuth])
+
+  if (checkingAuth) {
+    return (
+      <LoadingSpinner text="Checking authentication..." />
+    );
+  }
   return (
     <div>
     <Router>
@@ -43,6 +63,27 @@ export default function App() {
           path="/admin-dashboard"
           element={<ProtectedRoute role="admin" component={AdminDashboard} />}
         />
+        <Route 
+            path="/booking-history" 
+            element={<ProtectedRoute role="user" component={BookingHistory} />} 
+        />
+        <Route 
+          path="/edit-station/:stationId" 
+          element={<ProtectedRoute role="manager" component={EditStation} />} 
+        />
+        <Route 
+          path="/station/:stationId/bookings" 
+          element={<ProtectedRoute role="manager" component={StationBookings} />} 
+        />
+        <Route 
+          path="/payment-success" 
+          element={<PaymentSuccess />}
+        />
+        <Route 
+          path="/payment-failure" 
+          element={<PaymentFailure />}
+        />
+
       </Routes>
       
     </Router>

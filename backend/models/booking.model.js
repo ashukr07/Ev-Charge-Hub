@@ -45,6 +45,10 @@ const bookingSchema = new mongoose.Schema({
         enum: ["pending", "paid"], 
         default: "pending" 
     },
+    baseAmount: { 
+        type: Number, 
+        required: true 
+    }, // Base amount for the booking
     totalAmount: { 
         type: Number, 
         default: 0 
@@ -58,15 +62,12 @@ const bookingSchema = new mongoose.Schema({
         type: Number, 
         default: 0 
     }, // Any applied rewards
-    usedCoupon: { 
-        type: Boolean, 
-        default: false 
-    }, // If discount was used
-
+    
     status: { 
         type: String, 
         enum: ["booked", "canceled", "completed", "no-show"], default: "booked" 
     },
+    stripePaymentIntentId: { type: String },
 },{timestamps: true});
 
 const Booking = mongoose.model("Booking", bookingSchema);

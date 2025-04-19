@@ -9,7 +9,7 @@ export const protectRoute = async (req,res, next) => {
         const accessToken = req.cookies.accessToken;
         //console.log(accessToken)
         if(!accessToken){
-            return res.status(400).json({message:"Unauthorized-No access token provided"})
+            return res.status(400).json({message:"Unauthorized-Login or signup to proceed"})
         }
         try {
             const decoded = jwt.verify(accessToken,process.env.ACCESS_TOKEN_SECRET)

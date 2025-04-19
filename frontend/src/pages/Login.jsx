@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore.js";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/Spinner.jsx";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, setUser } = useAuthStore();
+  const { login, setUser,loading } = useAuthStore();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,7 +24,6 @@ export default function Login() {
       const response = await login(formData.email, formData.password, formData.role);
   
       if (!response) {
-        toast.error("Login failed. Please try again.");
         return;
       }
 
@@ -54,7 +54,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Login failed:", error);
-      toast.error("Login failed");
+      
     }
   };
   
@@ -92,7 +92,11 @@ export default function Login() {
             <option value="manager">Manager</option>
             <option value="admin">Admin</option>
           </select>
-          <button type="submit" className="btn btn-primary w-full">Login</button>
+          {loading ? (
+            <LoadingSpinner text="Logging in..." />
+            ):(
+              <button type="submit" className="btn btn-primary w-full">Login</button>
+            )}
         </form>
         <div className="text-center mt-3">
           <a href="/forgot-password" className="text-secondary">Forgot Password?</a>

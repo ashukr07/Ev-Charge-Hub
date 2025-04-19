@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useAuthStore } from "../stores/authStore.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/Spinner.jsx";
 
 export default function ChangePassword() {
   const navigate = useNavigate();
-  const { changePassword } = useAuthStore(); // ✅ Get changePassword function from store
+  const { changePassword,loading } = useAuthStore(); // ✅ Get changePassword function from store
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
@@ -67,7 +68,17 @@ export default function ChangePassword() {
             required
             className="input input-bordered w-full mb-3"
           />
-          <button type="submit" className="btn btn-primary w-full">Change Password</button>
+          <button 
+            type="submit" 
+            className="btn btn-primary w-full"
+            disabled={loading} // Disable button while loading
+          >
+            {loading ? (
+              <LoadingSpinner />
+            ) : (
+              "Change Password"
+            )}
+          </button>
         </form>
       </div>
     </div>

@@ -23,6 +23,9 @@ import StationBookings from './pages/StationBookings';
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import LoadingSpinner from './components/Spinner';
+import UserAnalytics from './pages/UserAnalytics';
+import ManagerAnalytics from './pages/ManagerAnalytics';
+import AdminAnalytics from './pages/AdminAnalytics';
 
 export default function App() {
   const {checkAuth,checkingAuth} = useAuthStore()
@@ -83,6 +86,21 @@ export default function App() {
           path="/payment-failure" 
           element={<PaymentFailure />}
         />
+        <Route 
+          path="/user/analytics" 
+          element={<ProtectedRoute role="user" component={UserAnalytics} />}
+        />
+        <Route 
+          path="/manager/analytics" 
+          element={<ProtectedRoute role="manager" component={ManagerAnalytics} />} 
+        />
+
+        <Route
+          path="/admin/analytics"
+          element={<ProtectedRoute role="admin" component={AdminAnalytics} />}
+        />
+
+
 
       </Routes>
       

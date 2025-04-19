@@ -16,7 +16,7 @@ function Navbar() {
     { id: "booking", name: "Book Slot", path: "/booking-slot" },
     //{ id: "dashboard", name: "Dashboard", path: user ? `/${user.role}-dashboard` : "/login" },
   ];
-  console.log("in navbar",user);
+  //console.log("in navbar",user);
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-lg bg-neutral bg-opacity-50 shadow-md">
@@ -132,6 +132,15 @@ function Navbar() {
                   </Link>
                 </li>
               )}
+              {
+                user &&(
+                <li>
+                  <Link to = {`/${user.role}-dashboard`}>
+                    <button className="btn btn-primary w-full">Dashboard</button>
+                  </Link>
+                </li>
+              )
+              }
             </ul>
           </div>
         </div>

@@ -251,8 +251,8 @@ export const getUserBookings = async (req, res) => {
       (booking) =>
         booking.status !== "booked" || new Date(booking.startTime) <= now
     );
-    console.log("Upcoming Bookings: ", upcoming);
-    console.log("Booking History: ", history);
+    // console.log("Upcoming Bookings: ", upcoming);
+    // console.log("Booking History: ", history);
     return res.status(200).json({ upcoming, history });
   } catch (error) {
     console.error("Error in getUserBookings controller ", error.message);

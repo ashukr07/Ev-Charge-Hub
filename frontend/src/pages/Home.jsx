@@ -5,9 +5,11 @@ export default function Home() {
     <div className="min-h-screen bg-base-100 flex flex-col">
       {/* Hero Section */}
       <div
-        className="relative h-[70vh] bg-cover bg-center flex items-center justify-center text-white"
-        style={{ backgroundImage: "url('/ev.jpg')" }}
-      >
+        className="relative h-[70vh] bg-base-100 flex items-center justify-center text-white 
+        md:bg-cover md:bg-center"
+        style={{
+          backgroundImage: window.innerWidth >= 768 ? "url('/ev.jpg')" : "none",
+        }}>
         <div className="bg-base-100 bg-opacity-50 p-10 rounded-lg text-center">
           <h1 className="text-5xl font-bold text-primary">Welcome to EV Charge Hub</h1>
           <p className="mt-3 text-lg text-base-content">

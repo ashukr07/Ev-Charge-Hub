@@ -89,7 +89,7 @@ export default function AdminDashboard() {
       <input id="admin-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-side z-40">
         <label htmlFor="admin-drawer" className="drawer-overlay"></label>
-        <aside className="w-64 bg-secondary text-white p-6 fixed h-full flex flex-col justify-center items-center gap-4">
+        <aside className="w-64 bg-secondary text-white p-6 h-full flex flex-col justify-center items-center gap-4">
           <div className="avatar avatar-placeholder gap-4 items-center justify-center">
             <div className="ring-base-100 ring-offset-base-100 ring ring-offset-2 bg-neutral text-neutral-content w-24 rounded-full">
               <span className="text-3xl">{user?.name[0]}</span>
@@ -100,6 +100,9 @@ export default function AdminDashboard() {
           <p><strong>Role:</strong> {user?.role}</p>
           <Link to="/change-password" className="btn btn-accent mt-4">
             Change Password
+          </Link>
+          <Link to="/admin/analytics" className="btn btn-accent mt-4">
+          📈 View Analytics
           </Link>
         </aside>
       </div>

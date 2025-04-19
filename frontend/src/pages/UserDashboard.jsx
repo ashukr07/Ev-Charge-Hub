@@ -3,7 +3,6 @@ import { useAuthStore } from "../stores/authStore.js";
 import useUserStore from "../stores/userStore.js";
 import BookingCard from "../components/BookingCard";
 import { Link } from "react-router-dom";
-import UserAnalytics from "../components/UserAnalytics.jsx";
 import { ChevronRight } from "lucide-react";
 
 export default function UserDashboard() {
@@ -30,7 +29,6 @@ export default function UserDashboard() {
       <span className="text-sm text-primary">Open Sidebar</span>
     </label>
   </div>
-        <UserAnalytics />
         <h2 className="text-2xl font-bold mb-4 text-primary">Upcoming Bookings</h2>
         {upcomingBookings.length === 0 ? (
           <div className="alert alert-info">No upcoming bookings</div>
@@ -61,6 +59,10 @@ export default function UserDashboard() {
           <Link to="/booking-history" className="btn btn-accent mt-4">
             Booking History
           </Link>
+          <Link to="/user/analytics" className="btn btn-accent mt-4">
+  📊 View Analytics
+</Link>
+
         </aside>
       </div>
     </div>

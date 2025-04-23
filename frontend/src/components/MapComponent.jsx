@@ -33,6 +33,13 @@ const createSquareIcon = (status, isSelected) => {
     popupAnchor: [0, -50],
   });
 };
+const userIcon = new L.Icon({
+  iconUrl: "/user-location.png",
+  iconSize: [30, 40],
+  iconAnchor: [15, 40],
+  popupAnchor: [0, -35],
+});
+
 
 // Handles zooming into the selected station or user location
 function MapZoomHandler({ selectedStation, userLocation }) {
@@ -67,7 +74,7 @@ export default function MapComponent({ stations, onSelect, selectedStation, user
 
       {/* User Location Marker */}
       {userLocation && (
-        <Marker position={[userLocation.latitude, userLocation.longitude]}>
+        <Marker position={[userLocation.latitude, userLocation.longitude]} icon={userIcon}>
           <Popup>You are here</Popup>
         </Marker>
       )}

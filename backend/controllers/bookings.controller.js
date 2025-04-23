@@ -29,126 +29,96 @@ export const createBooking = async (req, res) => {
       paymentMethod,
     } = req.body;
 
-    // Step 1: Assume Frontend sends time in IST with proper offset (e.g., "2025-03-28T15:47:00+05:30")
     const startIST = new Date(startTime);
-    if (isNaN(startIST))
+    if (isNaN(startIST)) {
       return res.status(400).json({ message: "Invalid start time" });
-
-    const openingHour = 9; // 9:00 AM IST
-    const closingHour = 22; // 10:00 PM IST
-
-    const startHour = startIST.getHours();
-    const startMinutes = startIST.getMinutes();
-    // Check that booking start time is within allowed hours (IST)
-    if (startHour < openingHour || startHour >= closingHour) {
-      return res
-        .status(400)
-        .json({ message: "Booking must be between 9:00 AM and 10:00 PM IST." });
     }
 
     // Fetch station details
-    const station = await Station.findById(stationId).select(
-      "totalSlots power"
-    );
+    const station = await Station.findById(stationId).select("totalSlots power");
     if (!station) return res.status(404).json({ message: "Station not found" });
 
     // Ensure start time is in the future
     const currentTime = new Date();
     if (startIST < currentTime) {
-      return res
-        .status(400)
-        .json({ message: "You cannot book a slot in the past." });
+      return res.status(400).json({ message: "You cannot book a slot in the past." });
     }
 
     // Calculate estimated charging time
     const chargeTimeHours =
-      (vehicleCapacity * (targetBattery - currentBattery)) /
-      (100 * station.power);
+      (vehicleCapacity * (targetBattery - currentBattery)) / (100 * station.power);
     const chargeTimeMinutes = Math.ceil(chargeTimeHours * 60);
-    
-    // Calculate end time in IST
     const endIST = new Date(startIST.getTime() + chargeTimeMinutes * 60 * 1000);
 
-    // Extract end time components in IST
-    const endHour = endIST.getHours();
-    const endMinutes = endIST.getMinutes();
-
-    // Ensure end time does not exceed 10:00 PM IST
-    if (endHour > closingHour || (endHour === closingHour && endMinutes > 0)) {
+    // Check available slots
+    const bookedSlots = await checkAvailability(stationId, startIST, endIST);
+    if (bookedSlots >= station.totalSlots) {
       return res.status(400).json({
-        message: "Booking cannot exceed closing time (10 PM IST).",
+        message: "No available slots for the estimated charging time.",
       });
     }
 
-    // Check available slots (using startIST and endIST directly)
-    const bookedSlots = await checkAvailability(stationId, startIST, endIST);
-    if (bookedSlots >= station.totalSlots) {
-      return res
-        .status(400)
-        .json({
-          message: "No available slots for the estimated charging time.",
-        });
-    }
-
-    // Calculate base charging cost
+    // Calculate pricing
     const chargingRate = 5; // ₹5 per kWh
-    const energyUsed =
-      (vehicleCapacity * (targetBattery - currentBattery)) / 100;
+    const energyUsed = (vehicleCapacity * (targetBattery - currentBattery)) / 100;
     let baseAmount = energyUsed * chargingRate;
-
     let penaltyApplied = 0;
     let rewardDiscount = 0;
     let totalCost = baseAmount;
 
-    // Apply pending penalty (if any)
+    // Apply penalties and rewards
     const user = await User.findById(req.user._id).select(
       "pendingPenalty rewards totalPenalties totalRewards"
     );
+
     if (user.pendingPenalty > 0) {
       penaltyApplied = user.pendingPenalty;
       totalCost += penaltyApplied;
       user.totalPenalties = (user.totalPenalties || 0) + penaltyApplied;
       user.pendingPenalty = 0;
     }
-    
 
-    // Apply rewards (if available)
     if (user.rewards > 0) {
       rewardDiscount = user.rewards;
       totalCost -= rewardDiscount;
       user.totalRewards = (user.totalRewards || 0) + rewardDiscount;
       user.rewards = 0;
     }
+
     await user.save({ validateBeforeSave: false });
 
-    // Create the booking (store times as received, which are in IST)
+    // Save the booking
     const newBooking = new Booking({
-  station: stationId,
-  user: req.user._id,
-  startTime: startIST,
-  endTime: endIST,
-  currentBattery,
-  targetBattery,
-  energyConsumed: energyUsed,
-  estimatedChargeTime: chargeTimeMinutes,
-  paymentMethod,
-  paymentStatus: "pending",
-  baseAmount,
-  penaltyApplied,
-  rewardDiscount,
-  totalAmount: totalCost,
-});
-
+      station: stationId,
+      user: req.user._id,
+      startTime: startIST,
+      endTime: endIST,
+      currentBattery,
+      targetBattery,
+      energyConsumed: energyUsed,
+      estimatedChargeTime: chargeTimeMinutes,
+      paymentMethod,
+      paymentStatus: "pending",
+      baseAmount,
+      penaltyApplied,
+      rewardDiscount,
+      totalAmount: totalCost,
+    });
 
     await newBooking.save();
 
+    // Auto-cancel after 10 minutes if unpaid
     setTimeout(async () => {
       const freshBooking = await Booking.findById(newBooking._id);
-      if (freshBooking && freshBooking.paymentMethod === "online" && freshBooking.paymentStatus !== "paid") {
+      if (
+        freshBooking &&
+        freshBooking.paymentMethod === "online" &&
+        freshBooking.paymentStatus !== "paid"
+      ) {
         await Booking.findByIdAndDelete(freshBooking._id);
-        console.log(`🕒 Booking ${freshBooking._id} deleted due to non-payment within 15 minutes.`);
+        console.log(`🕒 Booking ${freshBooking._id} deleted due to non-payment within 10 minutes.`);
       }
-    }, 10 * 60 * 1000); // 10 minutes
+    }, 10 * 60 * 1000);
 
     return res.status(201).json({
       message: "Booking confirmed!",
@@ -159,6 +129,7 @@ export const createBooking = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const cancelBooking = async (req, res) => {
   try {

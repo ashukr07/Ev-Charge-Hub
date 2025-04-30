@@ -116,6 +116,16 @@ export default function BookingSlot() {
     }
   };
 
+  const today = new Date();
+const maxDate = new Date();
+maxDate.setDate(today.getDate() + 5);
+
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+const minDateStr = formatDate(today);
+const maxDateStr = formatDate(maxDate);
+
+
   return (
     <div className="min-h-screen w-full p-5 bg-base-100">
       <h2 className="text-3xl font-bold text-primary text-center">Book a Charging Slot</h2>
@@ -131,12 +141,27 @@ export default function BookingSlot() {
         <div className="space-y-4 bg-neutral p-6 rounded-lg shadow-lg">
           <label className="block text-secondary font-semibold">Select Date</label>
           <input
-            type="date"
-            className="input input-bordered w-full"
-            value={bookingData.date}
-            onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
-          />
+  type="date"
+  className="input input-bordered w-full"
+  value={bookingData.date}
+  min={minDateStr}
+  max={maxDateStr}
+  onChange={(e) => {
+    const selectedDate = new Date(e.target.value);
+    const selectedDateOnly = new Date(selectedDate.toDateString());
+    const todayOnly = new Date(today.toDateString());
+    const maxDateOnly = new Date(maxDate.toDateString());
 
+    if (selectedDateOnly < todayOnly || selectedDateOnly > maxDateOnly) {
+      toast.error("Please select a date within the next 5 days.");
+      return;
+    }
+    setBookingData({ ...bookingData, date: e.target.value });
+  }}
+/>
+<p className="text-xs text-yellow-500">
+  * You can book only for the next 5 days.
+</p>
           <label className="block text-secondary font-semibold">Select Time</label>
           <input
             type="time"

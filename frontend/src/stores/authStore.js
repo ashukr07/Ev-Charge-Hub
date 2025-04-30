@@ -2,9 +2,6 @@ import { create } from "zustand";
 import axios from "../lib/axios.js";
 import toast from "react-hot-toast";
 
-
-
-
 export const useAuthStore = create((set) => ({
   //user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null,
   user: null,

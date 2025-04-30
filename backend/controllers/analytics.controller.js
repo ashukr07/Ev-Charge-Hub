@@ -113,9 +113,9 @@ export const getUserAnalytics = async (req, res) => {
     let bookingStatus = { booked: 0, canceled: 0, completed: 0, "no-show": 0 };
 
     bookings.forEach(booking => {
+    
       totalSpent += booking.totalAmount;
       totalEnergyConsumed += booking.energyConsumed;  // assuming energyConsumed is tracked in the booking
-       
 
       bookingStatus[booking.status] += 1;
     });

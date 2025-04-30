@@ -146,7 +146,6 @@ const useStationStore = create((set) => ({
   rejectStation: async (stationId) => {
     set({ loading: true });
     try {
-      console.log("hello bro")
       const res = await axiosInstance.put(`/station/reject/${stationId}`);
       console.log("Res ", res)
       set((state) => ({

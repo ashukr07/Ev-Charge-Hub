@@ -274,57 +274,96 @@ export const noShowBooking = async (req, res) => {
         path: "station",
         populate: { path: "manager", select: "email name" },
       });
+
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     if (booking.status !== "booked") {
-      return res
-        .status(400)
-        .json({ message: "Only active bookings can be marked as no-show" });
-    }
-    if (
-      booking.paymentMethod === "online" &&
-      booking.paymentStatus !== "paid"
-    ) {
-      return res.status(400).json({
-        message: "Booking cannot be completed before payment is done.",
-      });
+      return res.status(400).json({ message: "Only active bookings can be marked as no-show" });
     }
 
-    const penalty = 30;
     const user = booking.user;
     const station = booking.station;
 
-    user.pendingPenalty += penalty;
-    await user.save({ validateBeforeSave: false });
+    // Handle online paid booking
+    if (booking.paymentMethod === "online") {
+      if (booking.paymentStatus !== "paid") {
+        return res.status(400).json({ message: "Booking cannot be marked as no-show before payment is done." });
+      }
 
-    booking.status = "no-show";
-    await booking.save();
+      const refundAmount = Math.round(booking.totalAmount * 0.6);
+      const penaltyAmount = Math.round(booking.totalAmount * 0.4);
 
-    // ✅ Send email to user
-    await sendEmail({
-      to: user.email,
-      subject: "Booking Marked as No-Show",
-      text: `
+      // Refund 60% via Stripe
+      if (!booking.stripePaymentIntentId) {
+        return res.status(400).json({ message: "No payment intent found for this booking" });
+      }
+      
+      await stripe.refunds.create({
+        payment_intent: booking.stripePaymentIntentId,
+        amount: refundAmount * 100,
+      });   
+      user.totalPenalties += penaltyAmount;
+      user.save({ validateBeforeSave: false });
+
+      booking.status = "no-show";
+      booking.penaltyApplied = penaltyAmount;
+      await booking.save();
+
+      await sendEmail({
+        to: user.email,
+        subject: "Booking Marked as No-Show",
+        text: `
 Hi ${user.name},
 
-🚫 Your booking at "${station.name}" was marked as a **No-Show**.
-⚠️ A penalty of ₹${penalty} has been applied and will be charged in your next booking.
+Your booking at "${station.name}" was marked as a No-Show.
+40% of the payment (₹${penaltyAmount}) has been deducted as penalty.
+The remaining 60% (₹${refundAmount}) has been refunded to your original payment method.
 
 If you believe this was an error, please contact the station manager:
-📧 ${station.manager.email}
+Email: ${station.manager.email}
 
-Thank you for using EV Charge Hub.
-      `,
-    });
+Thank you,
+EV Charge Hub Team
+        `
+      });
+
+    } else {
+      // Handle offline payment
+      const penaltyAmount = Math.round(booking.totalAmount * 0.4);
+      user.pendingPenalty += penaltyAmount;
+      user.totalPenalties += penaltyAmount;
+      await user.save({ validateBeforeSave: false });
+
+      booking.status = "no-show";
+      booking.penaltyApplied = penaltyAmount;
+      await booking.save();
+
+      await sendEmail({
+        to: user.email,
+        subject: "Booking Marked as No-Show",
+        text: `
+Hi ${user.name},
+
+Your booking at "${station.name}" was marked as a No-Show.
+₹${penaltyAmount} will be charged as a penalty on your next booking (offline payment).
+
+If you believe this was an error, please contact the station manager:
+Email: ${station.manager.email}
+
+Thank you,
+EV Charge Hub Team
+        `
+      });
+    }
 
     return res.status(200).json({
-      message:
-        "User marked as no-show. Penalty will be applied on the next booking.",
+      message: "User marked as no-show. Appropriate penalty/refund handled.",
       booking,
     });
+
   } catch (error) {
-    console.error("Error in noShowBooking controller ", error.message);
-    return res.status(500).json({ message: error.message });
+    console.error("Error in noShowBooking controller:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -372,7 +411,7 @@ export const completeBooking = async (req, res) => {
     booking.totalAmount = totalCost;
     await booking.save();
 
-    const rewardAmount = 10;
+    const rewardAmount = totalCost * 0.05; // 5% of total cost
     user.rewards += rewardAmount;
     await user.save({ validateBeforeSave: false });
 

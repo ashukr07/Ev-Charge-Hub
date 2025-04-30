@@ -4,25 +4,37 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-base-100 flex flex-col">
       {/* Hero Section */}
-      <div
-        className="relative h-[70vh] bg-base-100 flex items-center justify-center text-white 
-        md:bg-cover md:bg-center"
-        style={{
-          backgroundImage: window.innerWidth >= 768 ? "url('/ev.jpg')" : "none",
-        }}>
-        <div className="bg-base-100 bg-opacity-50 p-10 rounded-lg text-center">
-          <h1 className="text-5xl font-bold text-primary">Welcome to EV Charge Hub</h1>
-          <p className="mt-3 text-lg text-base-content">
-            Find, book, and manage your EV charging slots with ease.
-          </p>
-          <div className="mt-6 space-x-4">
-            <Link to="/signup" className="btn btn-primary">Get Started</Link>
-            <Link to="/login" className="btn btn-secondary">Login</Link>
-          </div>
-        </div>
-      </div>
+      <div className="flex flex-col-reverse md:flex-row items-center justify-between px-6 py-12 md:py-16 gap-10 bg-base-200">
+  {/* Left Content */}
+  <div className="md:w-1/2 text-center md:text-left space-y-6">
+    <h1 className="text-4xl md:text-5xl font-bold text-primary">
+      Welcome to EV Charge Hub
+    </h1>
+    <p className="text-lg text-base-content">
+      Find, book, and manage your EV charging slots with ease.
+    </p>
+    <div className="flex justify-center md:justify-start gap-4">
+      <Link to="/signup" className="btn btn-primary">
+        Get Started
+      </Link>
+      <Link to="/login" className="btn btn-secondary">
+        Login
+      </Link>
+    </div>
+  </div>
 
-      {/* Features Section */}
+  {/* Right Image */}
+  <div className="md:w-1/2">
+    <img
+      src="/ev.png"
+      alt="EV Charging Illustration"
+      className="w-full h-auto rounded-lg shadow-lg"
+    />
+  </div>
+</div>
+
+
+      {/* Features Section (unchanged, but optional improvements can be made) */}
       <div className="py-12 px-5 text-center">
         <h2 className="text-4xl font-bold text-primary">Why Choose EV Charge Hub?</h2>
         <p className="mt-3 max-w-2xl mx-auto text-neutral-content">
